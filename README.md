@@ -64,6 +64,7 @@ There are 3 possible ways the value can be interpreted.
 * as Temperatur (you need this formula to convert the Value to °C: (Value-320)/18)
 * as Integer
 * as Bitmask
+
 The Function Type Byte defines how to interpret the Value.
 
 ## one small example
@@ -88,10 +89,36 @@ next try to understand the Message:
 1. FF -> Poll  
 2. Split down the paylod to 3 Byte long segments:  
 Remember, 1 Byte Function Type, 2 Bytes Value  
-* 40 03 04	-> Function 40: Actual Temperatur = 0x0304 = 772 ---> (772-320)/18 = 25,1°C  
+* 40 03 04 -> Function 40: Actual Temperatur = 0x0304 = 772 ---> (772-320)/18 = 25,1°C  
 * 3E 00 00 -> Function 3E:   
 * 3F 0C 08 -> Function 3F: Operating Mode = Bitmask = 0000 1100 0000 1000 ---> Bit 3 Eco Enabled, Bit 10 ? Bit 11 ?  
 * 3B 02 B3 -> Function 3B: Set Point Temperatur = 0x02B3 = 691 ---> (691-320)/18 = 20,6°C  
-3.
+<br>
+* 2D 7F FF -> Function 2D: Don't know what this is. 7FFF looks like 2'nd complement
+* 3D 00	00 -> Function 3D: 
+* 0C 00 24 -> Function 0C:
+* 37 01	9A -> Function 37: Min Set Point Temperatur = 0x019A = 410 ---> (410-320)/18 = 5°C
+* 38 03 B6 -> Function 38: Max Set Point Temperatur = 0x03B6 = 950 ---> (950-320)/18 = 35°C
+* 3B 02	B3 -> Function 3B: Set Point Temperatur = 0x02B3 = 691 ---> (691-320)/18 = 20,6°C
+* 3C 00 48 -> Function 3C: 
+* 35 80	00 -> Function 35: Bitmask
 
+## the Function Types
+So for now i know about this Function Types:
+T = Thermostat
+B = Base
+
+| Function Code | Direction | Meaning           | Interpretation |                                                                                         |
+|---------------|-----------|-------------------|----------------|-----------------------------------------------------------------------------------------|
+| 40            | T > B     | Actual Temp       | Temp           |                                                                                         |
+| 3E            | T > B     | ?                 |                | in my trace always 0                                                                    |
+| 3F            | T > B     | Operating Mode    | Bitmask        |                                                                                         |
+| 3B            | T <> B    | Setpoint Temp     | Temp           |                                                                                         |
+| 2D            | T < B     | ? Maybe offset    | Signed Value   | it looks like a 2'nd complement value                                                   |
+| 3D            | T < B     | ?                 |                | in my trace always 0                                                                    |
+| 0C            | T < B     | ?                 | Value          | this is not possible to be Temp because the value is to low. in my trace always 36      |
+| 37            | T < B     | Min setpoint Temp | Temp           |                                                                                         |
+| 38            | T < B     | Max setpoint Temp | Temp           |                                                                                         |
+| 3C            | T < B     | ?                 | Value          | this is not possible to be Temp because the value is to low. in my trace always 72      |
+| 35            | T < B     | ?                 | Bitmask ?      | the values in my trace looks like this is a bistmask. but i did not see diffrent values |
 
